@@ -1,0 +1,5 @@
+{
+    "token": "discordBotToken auth token goes here",
+    "clientId": "bot client id goes here",
+    "guildId": "guildId goes here, this is used to deploy commands to that guild."
+}

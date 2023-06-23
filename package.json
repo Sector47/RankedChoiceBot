@@ -1,0 +1,15 @@
+{
+  "name": "rankedchoice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "rankedchoice.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "eslint": "^8.43.0"
+  }
+}
