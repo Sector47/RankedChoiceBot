@@ -7,13 +7,16 @@ module.exports = {
 	customId: 'voteModalPopupButton',
 	async execute(interaction) {
 	// Check if the user has already voted
+		const [customId, pollId] = interaction.customId.split('-');
+		console.log(customId + ', ' + pollId);
+		const poll = pollData.getPoll(pollId);
 		console.log(interaction.user.id);
 		const userId = interaction.user.id;
-		if (pollData.hasVoted(userId)) {
+		if (pollData.hasVoted(pollId, userId)) {
 			await interaction.deferReply({ ephemeral: true });
 			await interaction.editReply({ content: 'You have already voted', ephemeral: true });
 			return;
 		}
-		await interaction.showModal(pollData.modal);
+		await interaction.showModal(poll.modal);
 	},
 };

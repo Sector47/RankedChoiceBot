@@ -3,23 +3,26 @@ const pollData = require('../../data/polldata.js');
 module.exports = {
 	customId: 'closePollButton',
 	async execute(interaction) {
-		if (interaction.user.id == pollData.creatorId) {
+		const [customId, pollId] = interaction.customId.split('-');
+		console.log(customId + ', ' + pollId);
+		const poll = pollData.getPoll(pollId);
+		if (interaction.user.id == poll.creatorId) {
 			await interaction.deferReply();
 			const finishedFields = [];
 			let count = 0;
-			for (const option in pollData.choices) {
+			for (const option in poll.choices) {
 				count++;
 
-				finishedFields.push({ name:'Choice ' + count, value:pollData.choices[option].value });
+				finishedFields.push({ name:'Choice ' + count, value:poll.choices[option].value });
 			}
 
 			const pollFinishEmbed = new EmbedBuilder()
 				.setColor('Red')
-				.setTitle(pollData.name + ' - This poll is closed.')
+				.setTitle(poll.name + ' - This poll is closed.')
 				.addFields(finishedFields);
 
-			pollData.message.edit({ embeds: [pollFinishEmbed], components: [] });
-			const result = await pollData.closePoll();
+			poll.message.edit({ embeds: [pollFinishEmbed], components: [] });
+			const result = await pollData.closePoll(pollId);
 			interaction.editReply(result.winningChoice + ' wins with ' + result.winningVotes + ' votes!');
 		}
 		else {

@@ -1,5 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const pollData = require('../../data/polldata.js');
 // const wait = require('node:timers/promises').setTimeout;
 
@@ -38,16 +37,14 @@ module.exports = {
 		}
 
 		const pollname = interaction.options.getString('pollname');
-		if (!pollData.modal == '') {
-			await interaction.reply({ content: 'A poll with that name already exists', ephemeral: true });
-			return;
-		}
 
 		// Initialize the poll data
-		pollData.init(pollname, interaction.user.id, optionList);
+		const poll = pollData.createPoll(pollname, interaction.user.id, optionList);
 
-		// Generate the modal using the poll data
-		// const modal = pollData.generateModal();
+		if (poll.error) {
+			await interaction.reply(poll.error);
+			return;
+		}
 
 		const fields = [];
 		let count = 0;
@@ -63,12 +60,12 @@ module.exports = {
 			.addFields(fields);
 
 		const voteButton = new ButtonBuilder()
-			.setCustomId('voteModalPopupButton')
+			.setCustomId(`voteModalPopupButton-${poll.id}`)
 			.setLabel('Vote')
 			.setStyle(ButtonStyle.Success);
 
 		const closePollButton = new ButtonBuilder()
-			.setCustomId('closePollButton')
+			.setCustomId(`closePollButton-${poll.id}`)
 			.setLabel('Close Poll')
 			.setStyle(ButtonStyle.Danger);
 
@@ -77,7 +74,7 @@ module.exports = {
 
 
 		await interaction.reply({ embeds: [pollEmbed], components: [row] });
-		pollData.pollDataEmbed = pollEmbed;
-		pollData.message = await interaction.fetchReply();
+		poll.embed = pollEmbed;
+		poll.message = await interaction.fetchReply();
 	},
 };

@@ -1,5 +1,6 @@
 {
     "token": "discordBotToken auth token goes here",
     "clientId": "bot client id goes here",
-    "guildId": "guildId goes here, this is used to deploy commands to that guild."
+    "guildId": "guildId goes here, this is used to deploy commands to that guild.",
+    "MAX_POLLS": 5
 }
