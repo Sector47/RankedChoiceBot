@@ -2,11 +2,15 @@
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
 const fs = require('fs');
+const { MAX_POLLS } = require('../config.json');
 
 
 const pollData = {
 	polls: [],
 	createPoll: function(name, creatorId, choices) {
+		if (this.polls.length >= MAX_POLLS) {
+			return { error: 'Too many active polls, you may only have 5 active polls at a time. Please close an existing poll before creating a new one.' };
+		}
 		const id = this.generateId();
 		const poll = {
 			id,
@@ -35,7 +39,7 @@ const pollData = {
 		}
 	},
 	savePolls: function() {
-		fs.writeFile('polls.json', JSON.stringify(this.polls), (e) => {
+		fs.writeFileSync('polls.json', JSON.stringify(this.polls), (e) => {
 			if (e) throw e;
 			console.log('Polls saved to disk');
 		});
@@ -68,6 +72,15 @@ const pollData = {
 		this.savePolls();
 		return 'Vote submitted';
 	},
+	getVoteNumbers: function(pollId) {
+		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
+		if (!poll) {
+			console.log('Poll not found');
+			return {};
+		}
+		console.log('poll.votes.length: ' + Object.keys(poll.votes).length);
+		return Object.keys(poll.votes).length;
+	},
 	getTotalVotes: function(pollId) {
 		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
 		if (!poll) {
@@ -84,7 +97,6 @@ const pollData = {
 				const choice = vote.choiceNumber;
 				const rank = vote.rankingAmount;
 				totalVotes[choice] += rank;
-				console.log(choice + ' ' + rank);
 			}
 		}
 		console.log(totalVotes);
@@ -168,7 +180,6 @@ const pollData = {
 		return !!poll.votes[userId];
 	},
 	getPoll: function(pollId) {
-		console.log(this.polls);
 		return this.polls.find((p) => p.id === parseInt(pollId, 10));
 	},
 };

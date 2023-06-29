@@ -1,5 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const pollData = require('../../data/polldata.js');
 // const wait = require('node:timers/promises').setTimeout;
 
@@ -38,16 +37,14 @@ module.exports = {
 		}
 
 		const pollname = interaction.options.getString('pollname');
-		/* if (!pollData.modal == '') {
-			await interaction.reply({ content: 'A poll with that name already exists', ephemeral: true });
-			return;
-		} */
 
 		// Initialize the poll data
 		const poll = pollData.createPoll(pollname, interaction.user.id, optionList);
 
-		// Generate the modal using the poll data
-		// const modal = pollData.generateModal();
+		if (poll.error) {
+			await interaction.reply(poll.error);
+			return;
+		}
 
 		const fields = [];
 		let count = 0;
