@@ -5,6 +5,9 @@ module.exports = {
 	async execute(interaction) {
 		// Get the user's input from the modal
 		// const rankedVotes = ...;
+		const [customId, pollId] = interaction.customId.split('-');
+		console.log(customId + ', ' + pollId);
+		const poll = pollData.getPoll(pollId);
 
 		// Submit the user's votes
 		console.log(interaction);
@@ -15,7 +18,7 @@ module.exports = {
 			rankedVotes.push({ choiceNumber, rankingAmount });
 		});
 		let result = '';
-		result = pollData.submitVote(pollData.name, interaction.user.id, rankedVotes);
+		result = pollData.submitVote(poll.id, interaction.user.id, rankedVotes);
 
 		// Acknowledge the interaction
 		await interaction.reply({ content: result, ephemeral: true });

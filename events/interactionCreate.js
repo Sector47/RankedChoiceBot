@@ -23,7 +23,9 @@ module.exports = {
 		}
 		else if (interaction.isButton()) {
 			try {
-				const buttonHandler = interaction.client.buttonHandlers.get(interaction.customId);
+				const [customId, pollId] = interaction.customId.split('-');
+				console.log(customId + ', ' + pollId);
+				const buttonHandler = interaction.client.buttonHandlers.get(customId);
 				if (buttonHandler) {
 					await buttonHandler.execute(interaction);
 				}
@@ -38,7 +40,9 @@ module.exports = {
 		else if (interaction.isModalSubmit()) {
 			// Get the user's input from the modal
 			try {
-				const submitHandler = interaction.client.submitHandlers.get(interaction.customId);
+				const [customId, pollId] = interaction.customId.split('-');
+				console.log(customId + ', ' + pollId);
+				const submitHandler = interaction.client.submitHandlers.get(customId);
 				if (submitHandler) {
 					await submitHandler.execute(interaction);
 				}
