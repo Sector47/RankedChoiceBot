@@ -18,5 +18,8 @@ Use this to create polls for voting with users on discord in a ranked choice sty
 config.json file is used to setup your bot for your instance along with the discord developer portal.
 use node ./deploy-commands.js to update discord slash commands for your bot.
 
+install discord.js 
+npm install discord.js
+
 # Run
 node ./index.js
