@@ -1,5 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const pollData = require('../../data/polldata.js');
+const closePoll = require('../../functions/closePoll.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -9,31 +10,21 @@ module.exports = {
 	async execute(interaction) {
 		const activePolls = [...pollData.polls];
 		try {
+			let pollsClosed = false;
 			if (activePolls.length != 0) {
 				await interaction.reply('Closing all polls');
 				for (const poll of activePolls) {
-					const finishedFields = [];
-					let count = 0;
-					for (const option in poll.choices) {
-						count++;
-
-						finishedFields.push({ name:'Choice ' + count, value:poll.choices[option].value });
+					if (poll.guildId == interaction.guild.id) {
+						pollsClosed = true;
+						await closePoll(interaction, poll.id);
 					}
-
-					const pollFinishEmbed = new EmbedBuilder()
-						.setColor('Red')
-						.setTitle(poll.name + ' - This poll is closed.')
-						.addFields(finishedFields);
-
-					poll.message.edit({ embeds: [pollFinishEmbed], components: [] });
-					const result = await pollData.closePoll(poll.id);
-					interaction.followUp({ embeds: [pollFinishEmbed], components: [] });
-					interaction.followUp(result.winningChoice + ' wins with ' + result.winningVotes + ' votes!');
 				}
+			}
+			if (pollsClosed) {
 				await interaction.followUp('All polls have been closed.');
 			}
 			else {
-				await interaction.reply('There are no polls to close.');
+				await interaction.editReply('There are no polls to close.');
 			}
 		}
 		catch (e) {

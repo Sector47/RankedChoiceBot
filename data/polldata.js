@@ -7,7 +7,7 @@ const { MAX_POLLS } = require('../config.json');
 
 const pollData = {
 	polls: [],
-	createPoll: function(name, creatorId, choices) {
+	createPoll: function(name, creatorId, choices, guildId) {
 		if (this.polls.length >= MAX_POLLS) {
 			return { error: 'Too many active polls, you may only have 5 active polls at a time. Please close an existing poll before creating a new one.' };
 		}
@@ -16,15 +16,24 @@ const pollData = {
 			id,
 			name,
 			creatorId,
+			guildId,
 			embed: '',
 			row: '',
 			choices,
 			votes: {},
 			modal: this.generateModal(id, name, choices),
+			messageId: null,
+			channelId: null,
 		};
 		this.polls.push(poll);
 		this.savePolls();
 		return poll;
+	},
+	getPollMessage: async function(pollId, client) {
+		const poll = this.getPoll(pollId);
+		if (poll.messageId) {
+			return await client.channels.cache.get(poll.channelId).messages.fetch(poll.messageId);
+		}
 	},
 	loadPolls: function() {
 		try {
@@ -45,7 +54,7 @@ const pollData = {
 		});
 	},
 	submitVote: function(pollId, userId, rankedVotes) {
-		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
+		const poll = this.getPoll(pollId);
 		if (!poll) {
 			console.log('Poll not found');
 			return 'Poll not found';
@@ -73,19 +82,19 @@ const pollData = {
 		return 'Vote submitted';
 	},
 	getVoteNumbers: function(pollId) {
-		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
+		const poll = this.getPoll(pollId);
 		if (!poll) {
 			console.log('Poll not found');
-			return {};
+			return 'Poll not found';
 		}
 		console.log('poll.votes.length: ' + Object.keys(poll.votes).length);
 		return Object.keys(poll.votes).length;
 	},
 	getTotalVotes: function(pollId) {
-		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
+		const poll = this.getPoll(pollId);
 		if (!poll) {
 			console.log('Poll not found');
-			return {};
+			return 'Poll not found';
 		}
 		const totalVotes = {};
 		for (const choice of poll.choices) {
@@ -103,10 +112,10 @@ const pollData = {
 		return totalVotes;
 	},
 	getResults: function(pollId) {
-		const poll = this.polls.find((p) => p.id === parseInt(pollId, 10));
+		const poll = this.getPoll(pollId);
 		if (!poll) {
 			console.log('Poll not found');
-			return {};
+			return 'Poll not found';
 		}
 
 		const totalVotes = this.getTotalVotes(parseInt(pollId, 10));
@@ -119,6 +128,27 @@ const pollData = {
 				highestVote = vote;
 			}
 		}
+
+		// Check if there is a draw
+		const tiedWins = [];
+		for (const choiceIndex in totalVotes) {
+			const vote = totalVotes[choiceIndex];
+			if (vote === highestVote && choiceIndex !== highestChoice) {
+				const choiceName = poll.choices.find(
+					(choice) => choice.name === choiceIndex,
+				).value;
+				tiedWins.push(choiceName);
+			}
+		}
+
+		if (tiedWins.length > 0) {
+			const choiceName = poll.choices.find(
+				(choice) => choice.name === highestChoice,
+			).value;
+			tiedWins.push(choiceName);
+			return { highestChoice: tiedWins, highestVote };
+		}
+
 		// Find the winning choice object
 		const winningChoiceObject = poll.choices.find(
 			(choice) => choice.name === highestChoice,
@@ -127,11 +157,31 @@ const pollData = {
 
 		return { highestChoice: winningChoice, highestVote };
 	},
+	getRanks: function(pollId, choice) {
+		const poll = this.getPoll(pollId);
+		if (!poll) {
+			console.log('Poll not found');
+			return 'Poll not found';
+		}
+		let totalRanks = 0;
+		if (poll.votes) {
+			for (const userId in poll.votes) {
+				const rankedVotes = poll.votes[userId];
+				for (const vote of rankedVotes) {
+					if (vote.choiceNumber === choice) {
+						totalRanks += vote.rankingAmount;
+					}
+				}
+			}
+		}
+		console.log(choice + 'got x ranks: ' + totalRanks);
+		return totalRanks;
+	},
 	closePoll: function(pollId) {
 		const pollIndex = this.polls.findIndex((p) => p.id === parseInt(pollId, 10));
 		if (pollIndex === -1) {
 			console.log('Poll not found');
-			return;
+			return 'Poll not found';
 		}
 
 		const totalVotes = this.getTotalVotes(pollId);
