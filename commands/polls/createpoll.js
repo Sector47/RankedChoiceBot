@@ -32,14 +32,15 @@ module.exports = {
 		const optionList = [];
 		for (const option in interaction.options.data) {
 			if (interaction.options.data[option].value != '' && interaction.options.data[option].name != 'pollname') {
-				optionList.push({ name:interaction.options.data[option].name, value:interaction.options.data[option].value });
+				// only use this if additional options are added like modifiers for the poll: otherwise the option should match withconst number = parseInt(name.match(/\d+/)[0]);
+				optionList.push({ name:option, value:interaction.options.data[option].value });
 			}
 		}
 
 		const pollname = interaction.options.getString('pollname');
 
 		// Initialize the poll data
-		const poll = pollData.createPoll(pollname, interaction.user.id, optionList);
+		const poll = pollData.createPoll(pollname, interaction.user.id, optionList, interaction.guild.id);
 
 		if (poll.error) {
 			await interaction.reply(poll.error);
@@ -47,11 +48,9 @@ module.exports = {
 		}
 
 		const fields = [];
-		let count = 0;
 		for (const option in optionList) {
-			count++;
 
-			fields.push({ name:'Choice ' + count, value:optionList[option].value });
+			fields.push({ name:optionList[option].value, value:'\u200B' });
 		}
 
 		const pollEmbed = new EmbedBuilder()
@@ -76,5 +75,8 @@ module.exports = {
 		await interaction.reply({ embeds: [pollEmbed], components: [row] });
 		poll.embed = pollEmbed;
 		poll.message = await interaction.fetchReply();
+		poll.messageId = poll.message.id;
+		poll.channelId = poll.message.channelId;
+		pollData.savePolls();
 	},
 };

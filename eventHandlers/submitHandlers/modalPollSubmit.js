@@ -22,12 +22,11 @@ module.exports = {
 
 		// Update pollembed with new vote total:
 		if (result == 'Vote submitted') {
-			let count = 0;
 			const finishedFields = [];
+			let pointValue = '';
 			for (const option in poll.choices) {
-				count++;
-
-				finishedFields.push({ name:'Choice ' + count, value:poll.choices[option].value });
+				pointValue = pollData.getRanks(pollId, poll.choices[option].name);
+				finishedFields.push({ name:poll.choices[option].value, value:`${pointValue}` });
 			}
 
 			const pollEmbed = new EmbedBuilder()
@@ -48,6 +47,8 @@ module.exports = {
 			const row = new ActionRowBuilder()
 				.addComponents(voteButton, closePollButton);
 
+			console.log('modalPollButtonSubmit.js ' + poll.message);
+			console.log('modalPollButtonSubmit.js pollmessage' + pollData.getPollMessage(pollId, interaction.client));
 			poll.message.edit({ embeds: [pollEmbed], components: [row] });
 		}
 
