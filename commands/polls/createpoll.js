@@ -35,15 +35,15 @@ module.exports = {
 
 		// Check if the poll name is 45 characters or less
 		if (pollname.length > 45) {
-			await interaction.reply({content: 'Poll name must be 45 characters or less', ephemeral: true});
-			return; // Stop execution if the poll name is too long
+			await interaction.reply({content: 'Poll Name must be 45 characters or less', ephemeral: true});
+			throw new Error(`Poll Name must be 45 characters or less`); // Throw error if the poll name is too long
 		}
 
 		for (const option in interaction.options.data) {
 			if (interaction.options.data[option].value != '' && interaction.options.data[option].name != 'pollname') {
 				if (interaction.options.data[option].value.length > 45) {
-					await interaction.reply({content: `Option \${interaction.options.data[option].name} must be 45 characters or less`, ephemeral: true});
-					return; // Stop execution if any option value is too long
+					await interaction.reply({content: `Option ${interaction.options.data[option].name} must be 45 characters or less`, ephemeral: true});
+					throw new Error(`Option ${option.name} must be 45 characters or less`); // Throw error if any option value is too long
 				}
 
 				// only use this if additional options are added like modifiers for the poll: otherwise the option should match withconst number = parseInt(name.match(/\d+/)[0]);
