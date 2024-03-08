@@ -7,7 +7,7 @@ const { MAX_POLLS } = require('../config.json');
 
 const pollData = {
 	polls: [],
-	createPoll: function(name, creatorId, choices, guildId) {
+	createPoll: function(name, creatorId, choices, guildId, hidden = false) {
 		if (this.polls.length >= MAX_POLLS) {
 			return { error: 'Too many active polls, you may only have 5 active polls at a time. Please close an existing poll before creating a new one.' };
 		}
@@ -17,6 +17,7 @@ const pollData = {
 			name,
 			creatorId,
 			guildId,
+			hidden,
 			embed: '',
 			row: '',
 			choices,

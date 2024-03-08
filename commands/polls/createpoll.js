@@ -6,6 +6,10 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('createpoll')
 		.setDescription('Create a poll')
+		.addBooleanOption(option =>
+			option.setName('hidden')
+				.setDescription('Toggle visibility of poll responses')
+				.setRequired(false))
 		.addStringOption(option =>
 			option.setName('pollname')
 				.setDescription('Name of the poll')
@@ -54,7 +58,7 @@ module.exports = {
 		
 
 		// Initialize the poll data
-		const poll = pollData.createPoll(pollname, interaction.user.id, optionList, interaction.guild.id);
+		const poll = pollData.createPoll(pollname, interaction.user.id, optionList, interaction.guild.id, interaction.options.getBoolean('hidden'));
 
 		if (poll.error) {
 			await interaction.reply(poll.error);
