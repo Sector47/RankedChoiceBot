@@ -30,14 +30,28 @@ module.exports = {
 
 	async execute(interaction) {
 		const optionList = [];
+
+		const pollname = interaction.options.getString('pollname');
+
+		// Check if the poll name is 45 characters or less
+		if (pollname.length > 45) {
+			await interaction.reply('Poll name must be 45 characters or less');
+			return; // Stop execution if the poll name is too long
+		}
+
 		for (const option in interaction.options.data) {
 			if (interaction.options.data[option].value != '' && interaction.options.data[option].name != 'pollname') {
+				if (optionValue.length > 45) {
+					await interaction.reply(`Option \${interaction.options.data[option].name} must be 45 characters or less`);
+					return; // Stop execution if any option value is too long
+				}
+
 				// only use this if additional options are added like modifiers for the poll: otherwise the option should match withconst number = parseInt(name.match(/\d+/)[0]);
 				optionList.push({ name:option, value:interaction.options.data[option].value });
 			}
 		}
 
-		const pollname = interaction.options.getString('pollname');
+		
 
 		// Initialize the poll data
 		const poll = pollData.createPoll(pollname, interaction.user.id, optionList, interaction.guild.id);
