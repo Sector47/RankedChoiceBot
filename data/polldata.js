@@ -36,6 +36,15 @@ const pollData = {
 			return await client.channels.cache.get(poll.channelId).messages.fetch(poll.messageId);
 		}
 	},
+	updatePollMessageId: function(pollId, newMessageId) {
+		const poll = this.getPoll(pollId);
+		if (poll) {
+		  poll.messageId = newMessageId;
+		  this.savePolls;
+		} else {
+		  console.error(`Poll with ID ${pollId} not found.`);
+		}
+	},
 	loadPolls: function() {
 		try {
 			const data = fs.readFileSync('polls.json', 'utf8');

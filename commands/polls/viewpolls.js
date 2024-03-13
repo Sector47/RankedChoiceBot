@@ -47,7 +47,9 @@ module.exports = {
 					console.log('viewPolls.js' + poll.message);
 					poll.message = await interaction.channel.send({ embeds: [pollEmbed], components: [row] });
 					poll.embed = pollEmbed;
-					console.log(poll.message.id);
+					poll.message = await interaction.fetchReply();
+					
+					pollData.updatePollMessageId(poll.id, poll.message.id);
 				}
 			}
 			if (!hasPoll) {
