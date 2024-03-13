@@ -6,10 +6,6 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('createpoll')
 		.setDescription('Create a poll')
-		.addBooleanOption(option =>
-			option.setName('hidden')
-				.setDescription('Toggle visibility of poll responses')
-				.setRequired(false))
 		.addStringOption(option =>
 			option.setName('pollname')
 				.setDescription('Name of the poll')
@@ -30,7 +26,11 @@ module.exports = {
 				.setDescription('Poll choice 4'))
 		.addStringOption(option =>
 			option.setName('choice5')
-				.setDescription('Poll choice 5')),
+				.setDescription('Poll choice 5'))
+		.addBooleanOption(option =>
+			option.setName('hidden')
+				.setDescription('Toggle visibility of poll responses')
+				.setRequired(false)),
 
 	async execute(interaction) {
 		const optionList = [];
