@@ -39,7 +39,7 @@ module.exports = {
 
 		// Check if the poll name is 45 characters or less
 		if (pollname.length > 45) {
-			await interaction.reply({content: 'Poll Name must be 45 characters or less', ephemeral: true});
+			await interaction.reply({ content: 'Poll Name must be 45 characters or less', ephemeral: true });
 			throw new Error('Poll Name must be 45 characters or less');
 		}
 
