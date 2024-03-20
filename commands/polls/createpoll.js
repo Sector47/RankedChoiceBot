@@ -40,22 +40,20 @@ module.exports = {
 		// Check if the poll name is 45 characters or less
 		if (pollname.length > 45) {
 			await interaction.reply({content: 'Poll Name must be 45 characters or less', ephemeral: true});
-			throw new Error(`Poll Name must be 45 characters or less`); // Throw error if the poll name is too long
+			throw new Error('Poll Name must be 45 characters or less');
 		}
 
 		for (const option in interaction.options.data) {
-			if (interaction.options.data[option].value != '' && interaction.options.data[option].name != 'pollname') {
+			if (interaction.options.data[option].value != '' && interaction.options.data[option].name != 'pollname' && interaction.options.data[option].name != 'hidden') {
 				if (interaction.options.data[option].value.length > 45) {
-					await interaction.reply({content: `Option ${interaction.options.data[option].name} must be 45 characters or less`, ephemeral: true});
-					throw new Error(`Option ${interaction.options.data[option].name} must be 45 characters or less`); // Throw error if any option value is too long
+					await interaction.reply({ content: `Option ${interaction.options.data[option].name} must be 45 characters or less`, ephemeral: true });
+					throw new Error(`Option ${interaction.options.data[option].name} must be 45 characters or less`);
 				}
 
 				// only use this if additional options are added like modifiers for the poll: otherwise the option should match withconst number = parseInt(name.match(/\d+/)[0]);
 				optionList.push({ name:option, value:interaction.options.data[option].value });
 			}
 		}
-
-		
 
 		// Initialize the poll data
 		const poll = pollData.createPoll(pollname, interaction.user.id, optionList, interaction.guild.id, interaction.options.getBoolean('hidden'));
@@ -65,16 +63,10 @@ module.exports = {
 			return;
 		}
 
-		const fields = [];
-		for (const option in optionList) {
-
-			fields.push({ name:optionList[option].value, value:'\u200B' });
-		}
-
 		const pollEmbed = new EmbedBuilder()
 			.setColor('Blurple')
 			.setTitle(pollname)
-			.addFields(fields);
+			.addFields(poll.choices.map((choice, index) => ({ name: 'Choice ' + (index + 1) + ': ' + choice.value, value: ' ' })));
 
 		const voteButton = new ButtonBuilder()
 			.setCustomId(`voteModalPopupButton-${poll.id}`)

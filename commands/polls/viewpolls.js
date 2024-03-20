@@ -20,16 +20,23 @@ module.exports = {
 					hasPoll = true;
 					let pollEmbed;
 					if (pollData.getVoteNumbers(poll.id) != 0) {
+						const finishedFields = [];
+						let pointValue = '';
+						for (const option in poll.choices) {
+							const index = Object.keys(poll.choices).indexOf(option);
+							pointValue = poll.hidden ? 'Results are hidden' : `${pollData.getRanks(poll.id, poll.choices[option].name)} votes.`;
+							finishedFields.push({ name:`Choice ${index + 1}: ${poll.choices[option].value}`, value:`${pointValue}` });
+						}
 						pollEmbed = new EmbedBuilder()
 							.setColor('Blurple')
 							.setTitle(poll.name + `: ${pollData.getVoteNumbers(poll.id)} votes.`)
-							.addFields(poll.choices.map((choice, index) => ({ name: 'Choice ' + (index + 1), value: choice.value })));
+							.addFields(finishedFields);
 					}
 					else {
 						pollEmbed = new EmbedBuilder()
 							.setColor('Blurple')
 							.setTitle(poll.name)
-							.addFields(poll.choices.map((choice, index) => ({ name: 'Choice ' + (index + 1), value: choice.value })));
+							.addFields(poll.choices.map((choice, index) => ({ name: 'Choice ' + (index + 1) + ': ', value: choice.value })));
 					}
 					const voteButton = new ButtonBuilder()
 						.setCustomId(`voteModalPopupButton-${poll.id}`)
@@ -45,11 +52,13 @@ module.exports = {
 						.addComponents(voteButton, closePollButton);
 
 					console.log('viewPolls.js' + poll.message);
-					poll.message = await interaction.channel.send({ embeds: [pollEmbed], components: [row] });
+
 					poll.embed = pollEmbed;
-					poll.message = await interaction.fetchReply();
-					
-					pollData.updatePollMessageId(poll.id, poll.message.id);
+					poll.message = await interaction.channel.send({ embeds: [pollEmbed], components: [row] });
+					poll.messageId = poll.message.id;
+					poll.channelId = poll.message.channelId;
+					pollData.updatePollMessageId(poll.id, poll.messageId);
+					pollData.savePolls();
 				}
 			}
 			if (!hasPoll) {

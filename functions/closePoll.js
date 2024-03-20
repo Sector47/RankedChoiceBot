@@ -2,13 +2,16 @@ const { EmbedBuilder } = require('discord.js');
 const pollData = require('../data/polldata.js');
 
 async function closePoll(interaction, pollId) {
-	await interaction.deferReply();
+	if (interaction.commandName != 'closeallpolls') {
+		await interaction.deferReply();
+	}
 	const poll = pollData.getPoll(pollId);
 	const finishedFields = [];
 	let pointValue = '';
 	for (const option in poll.choices) {
+		const index = Object.keys(poll.choices).indexOf(option);
 		pointValue = pollData.getRanks(pollId, poll.choices[option].name);
-		finishedFields.push({ name:poll.choices[option].value, value:`${pointValue}` });
+		finishedFields.push({ name:`Choice ${index + 1}: ${poll.choices[option].value}`, value:`${pointValue}` });
 	}
 
 	const pollFinishEmbed = new EmbedBuilder()

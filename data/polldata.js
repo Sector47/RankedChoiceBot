@@ -39,10 +39,11 @@ const pollData = {
 	updatePollMessageId: function(pollId, newMessageId) {
 		const poll = this.getPoll(pollId);
 		if (poll) {
-		  poll.messageId = newMessageId;
-		  this.savePolls;
-		} else {
-		  console.error(`Poll with ID ${pollId} not found.`);
+			poll.messageId = newMessageId;
+			this.savePolls;
+		}
+		else {
+			console.error(`Poll with ID ${pollId} not found.`);
 		}
 	},
 	loadPolls: function() {

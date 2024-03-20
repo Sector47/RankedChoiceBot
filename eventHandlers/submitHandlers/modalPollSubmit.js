@@ -25,8 +25,9 @@ module.exports = {
 			const finishedFields = [];
 			let pointValue = '';
 			for (const option in poll.choices) {
-				pointValue = poll.hidden ? 'Results are hidden' : pollData.getRanks(pollId, poll.choices[option].name);
-				finishedFields.push({ name:poll.choices[option].value, value:`${pointValue}` });
+				const index = Object.keys(poll.choices).indexOf(option);
+				pointValue = poll.hidden ? 'Results are hidden' : `${pollData.getRanks(pollId, poll.choices[option].name)} votes.`;
+				finishedFields.push({ name:`Choice ${index + 1}: ${poll.choices[option].value}`, value:`${pointValue}` });
 			}
 
 			const pollEmbed = new EmbedBuilder()
